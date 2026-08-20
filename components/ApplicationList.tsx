@@ -19,18 +19,24 @@ export default function ApplicationList({
     <div>
       <div className="mb-8 flex items-baseline justify-between">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-600">Registry</p>
-          <h2 className="mt-2 font-display text-3xl font-medium text-black">Application status</h2>
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-600">
+            Submitted Application(s)
+          </p>
+          <h2 className="mt-2 font-display text-3xl font-medium text-black">
+            Recent applications
+          </h2>
         </div>
         {status === "ready" && (
           <span className="font-mono text-xs text-ink-soft">
-            {applications.length} on file
+            {applications.length} submitted
           </span>
         )}
       </div>
 
       {status === "loading" && <LoadingState />}
-      {status === "error" && <ErrorState message={errorMessage} onRetry={onRetry} />}
+      {status === "error" && (
+        <ErrorState message={errorMessage} onRetry={onRetry} />
+      )}
       {status === "ready" && applications.length === 0 && <EmptyState />}
       {status === "ready" && applications.length > 0 && (
         <ul className="space-y-5">
@@ -60,7 +66,11 @@ function ApplicationStub({ application }: { application: Application }) {
             day: "numeric",
             year: "numeric",
           })}{" "}
-          · {submitted.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
+          ·{" "}
+          {submitted.toLocaleTimeString(undefined, {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </p>
       </div>
       <div className="relative col-span-1 flex flex-col items-center justify-center gap-2 bg-neutral-100 p-4">
@@ -77,7 +87,10 @@ function LoadingState() {
   return (
     <ul className="space-y-5" aria-busy="true" aria-live="polite">
       {[0, 1, 2].map((i) => (
-        <li key={i} className="animate-pulse overflow-hidden rounded-md border border-line">
+        <li
+          key={i}
+          className="animate-pulse overflow-hidden rounded-md border border-line"
+        >
           <div className="grid grid-cols-3">
             <div className="col-span-2 space-y-2 p-4">
               <div className="h-4 w-2/3 rounded bg-neutral-300" />
@@ -96,10 +109,21 @@ function LoadingState() {
   );
 }
 
-function ErrorState({ message, onRetry }: { message: string | null; onRetry: () => void }) {
+function ErrorState({
+  message,
+  onRetry,
+}: {
+  message: string | null;
+  onRetry: () => void;
+}) {
   return (
-    <div className="rounded-md border border-black bg-neutral-100 p-6 text-center" role="alert">
-      <p className="font-display text-lg font-medium text-black">Couldn't load the registry</p>
+    <div
+      className="rounded-md border border-black bg-neutral-100 p-6 text-center"
+      role="alert"
+    >
+      <p className="font-display text-lg font-medium text-black">
+        Couldn't load the registry
+      </p>
       <p className="mx-auto mt-1.5 max-w-xs text-sm text-neutral-700">
         {message ?? "Something went wrong while fetching applications."}
       </p>
@@ -117,10 +141,12 @@ function ErrorState({ message, onRetry }: { message: string | null; onRetry: () 
 function EmptyState() {
   return (
     <div className="rounded-md border border-dashed border-line p-10 text-center">
-      <p className="font-display text-lg font-medium text-ink">No applications yet</p>
+      <p className="font-display text-lg font-medium text-ink">
+        No applications yet
+      </p>
       <p className="mx-auto mt-1.5 max-w-xs text-sm text-ink-soft">
-        Submit the form on the left — your entry will appear here with a tracking code the moment
-        it's filed.
+        Your application will appear here with a tracking code after it's
+        submitted.
       </p>
     </div>
   );

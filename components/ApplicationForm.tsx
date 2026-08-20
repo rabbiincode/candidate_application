@@ -1,8 +1,10 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 import { ApiError, submitApplication } from "@/lib/api";
 import type { Application, CandidateApplicationInput } from "@/lib/types";
+import ResumeUpload from "@/components/ResumeUpload";
+import { isValidPhoneNumber } from "@/lib/validation";
 
 const ROLES = [
   "Frontend Engineer",
@@ -31,7 +33,9 @@ function validateClientSide(input: CandidateApplicationInput): FieldErrors {
   if (!input.firstName.trim()) errors.firstName = "Enter your first name.";
   if (!input.lastName.trim()) errors.lastName = "Enter your last name.";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) errors.email = "Enter a valid email address.";
-  if (input.phone.trim().length < 7) errors.phone = "Enter a valid phone number.";
+  if (!isValidPhoneNumber(input.phone)) {
+    errors.phone = "Enter a valid phone number.";
+  }
   if (!input.role) errors.role = "Select the role you're applying for.";
   if (input.portfolioUrl.trim() && !/^https?:\/\/.+/i.test(input.portfolioUrl)) {
     errors.portfolioUrl = "Enter a link starting with http:// or https://.";
@@ -56,7 +60,7 @@ export default function ApplicationForm({ onSubmitted }: ApplicationFormProps) {
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [lastSubmitted, setLastSubmitted] = useState<Application | null>(null);
-  const resumeInputRef = useRef<HTMLInputElement>(null);
+  const [resumeResetKey, setResumeResetKey] = useState(0);
 
   function updateField<K extends keyof CandidateApplicationInput>(key: K, value: string) {
     setInput((prev) => ({ ...prev, [key]: value }));
@@ -79,7 +83,7 @@ export default function ApplicationForm({ onSubmitted }: ApplicationFormProps) {
       const application = await submitApplication(input);
       setLastSubmitted(application);
       setInput(EMPTY_INPUT);
-      if (resumeInputRef.current) resumeInputRef.current.value = "";
+      setResumeResetKey((key) => key + 1);
       setFieldErrors({});
       onSubmitted(application);
     } catch (err) {
@@ -98,10 +102,9 @@ export default function ApplicationForm({ onSubmitted }: ApplicationFormProps) {
     <div>
       <div className="mb-8">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-600">Application</p>
-        <h1 className="mt-2 font-display text-4xl font-medium text-black">Submit your candidacy</h1>
+        <h1 className="mt-2 font-display text-4xl font-medium text-black">Apply for a role</h1>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-ink-soft">
-          Fill in the form below. Once submitted, your application enters the registry on the
-          right with a tracking code you can reference in follow-ups.
+          Complete the form and we’ll provide a tracking code when your application is received.
         </p>
       </div>
 
@@ -169,6 +172,8 @@ export default function ApplicationForm({ onSubmitted }: ApplicationFormProps) {
             <input
               id="phone"
               type="tel"
+              inputMode="tel"
+              autoComplete="tel"
               value={input.phone}
               onChange={(e) => updateField("phone", e.target.value)}
               placeholder="+234 800 000 0000"
@@ -209,21 +214,15 @@ export default function ApplicationForm({ onSubmitted }: ApplicationFormProps) {
           />
         </Field>
 
-        <Field label="Resume" htmlFor="resume" error={fieldErrors.resume}>
-          <input
-            ref={resumeInputRef}
-            id="resume"
-            type="file"
-            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            onChange={(event) => {
-              setInput((previous) => ({ ...previous, resume: event.target.files?.[0] ?? null }));
-              setFieldErrors((previous) => ({ ...previous, resume: undefined }));
-            }}
-            disabled={submitting}
-            className={`${inputClasses(!!fieldErrors.resume)} file:mr-4 file:rounded-md file:border-0 file:bg-black file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-white`}
-          />
-          <p className="mt-1.5 text-xs text-neutral-500">PDF, DOC, or DOCX. Maximum 5 MB.</p>
-        </Field>
+        <ResumeUpload
+          disabled={submitting}
+          error={fieldErrors.resume}
+          resetKey={resumeResetKey}
+          onChange={(file) => {
+            setInput((previous) => ({ ...previous, resume: file }));
+            setFieldErrors((previous) => ({ ...previous, resume: undefined }));
+          }}
+        />
 
         <Field label="Cover note" htmlFor="coverNote" error={fieldErrors.coverNote}>
           <textarea
@@ -276,7 +275,7 @@ function Field({
       </label>
       {children}
       {error && (
-        <p className="mt-1.5 text-xs font-medium text-black" role="alert">
+        <p className="mt-1.5 text-xs font-medium text-red-600" role="alert">
           {error}
         </p>
       )}

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { Application, CandidateApplicationInput } from "@/lib/types";
+import { isValidPhoneNumber } from "@/lib/validation";
 
 let applications: Application[] = [];
 
@@ -27,7 +28,7 @@ function validate(input: Partial<CandidateApplicationInput>) {
   if (!input.email || !EMAIL_RE.test(input.email)) {
     fieldErrors.email = "Enter a valid email address.";
   }
-  if (!input.phone || input.phone.trim().length < 7) {
+  if (!input.phone || !isValidPhoneNumber(input.phone)) {
     fieldErrors.phone = "Enter a valid phone number.";
   }
   if (!input.role) {

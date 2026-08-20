@@ -26,8 +26,6 @@
 }
 
 @layer components {
-  /* The signature element: a torn ticket-stub used for each application
-     record, punched between the "candidate" half and the "registry" half. */
   .stub {
     position: relative;
     background: #ffffff;

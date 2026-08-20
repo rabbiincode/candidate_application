@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <main className="min-h-screen w-full px-6 py-16 sm:px-10 lg:px-16 xl:px-20">
       <div className="mb-10 flex items-center justify-between rounded-2xl bg-black px-6 py-5 shadow-lg">
-        <span className="font-display text-lg font-medium text-white">Candidate Registry</span>
+        <span className="font-display text-lg font-medium text-white">Careers</span>
         <span className="font-mono text-xs uppercase tracking-[0.2em] text-white">
           Open roles · Lagos &amp; remote
         </span>
