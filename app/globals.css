@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    @apply bg-paper text-ink font-body antialiased;
+    background-color: #ffffff;
+  }
+  * {
+    @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* The signature element: a torn ticket-stub used for each application
+     record, punched between the "candidate" half and the "registry" half. */
+  .stub {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #d4d4d4;
+  }
+
+  .stub::before {
+    content: "";
+    position: absolute;
+    left: 66%;
+    top: -1px;
+    bottom: -1px;
+    width: 0;
+    border-left: 1.5px dashed #a3a3a3;
+  }
+
+  .stub::after {
+    content: "";
+    position: absolute;
+    left: calc(66% - 7px);
+    top: -8px;
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    border: 1px solid #d4d4d4;
+    border-radius: 9999px;
+  }
+
+  .stub-notch-bottom {
+    position: absolute;
+    left: calc(66% - 7px);
+    bottom: -8px;
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    border: 1px solid #d4d4d4;
+    border-radius: 9999px;
+  }
+}
